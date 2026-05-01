@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ESC Marketing Dashboard — Vouch</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root{color-scheme:light;--nav:#0F1C2C;--taupe:#F7FAF2;--green:#3BE0AD;--dkgrn:#1A5745;--txtgr:#19A078;--yellow:#E8FC83;--blue:#50EAF2;--gray:#A8A8A8;--lgray:#EBEAE8;--bad:#C4391B;--good:#19A078;--warn:#BFA836;--muted:#8A9494;--body:#2B3D3D;--shadow:0 1px 2px rgba(15,28,44,.06),0 4px 12px rgba(15,28,44,.04)}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--taupe);color:var(--nav);font-family:"GT America",Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;padding:22px 24px 60px;max-width:1400px;margin:0 auto}
+h1,h2,h3{font-family:"Mirador",Georgia,serif;font-weight:600;letter-spacing:-.01em;color:var(--nav);margin:0}
+h1{font-size:28px}h2{font-size:20px;margin:22px 0 8px}h3{font-size:15px;margin:12px 0 8px}
+.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-weight:700;font-size:11px;color:var(--txtgr)}
+.muted{color:var(--gray)}.small{font-size:11px;color:var(--gray)}
+.header-wrap{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:14px}
+.header-meta{text-align:right;font-size:12px;color:var(--gray)}
+.brand-stripe{height:4px;background:linear-gradient(90deg,var(--green) 0%,var(--blue) 40%,var(--yellow) 70%,var(--green) 100%);border-radius:2px;margin:6px 0 22px}
+.tile-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:6px 0 18px}
+.tile-row.ps{grid-template-columns:repeat(6,1fr)}
+.tile{background:#fff;border:1px solid var(--lgray);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);min-height:90px}
+.tile .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);font-weight:700}
+.tile .val{font-size:22px;font-weight:600;font-family:"Mirador",Georgia,serif;margin-top:4px}
+.tile .sub{font-size:11px;color:var(--nav);margin-top:3px}
+.tile .delta{font-size:12px;font-weight:600;margin-top:3px}
+.delta.up{color:var(--good)}.delta.down{color:var(--bad)}.delta.flat{color:var(--gray)}
+.card{background:#fff;border:1px solid var(--lgray);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:900px){.card-grid,.tile-row{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.card-grid,.tile-row{grid-template-columns:1fr}}
+.canvas-wrap{position:relative;height:260px}.canvas-wrap.tall{height:340px}.canvas-wrap.xl{height:420px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+table th,table td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--lgray)}
+table th:first-child,table td:first-child{text-align:left;font-weight:600}
+table th{text-transform:uppercase;letter-spacing:.06em;font-size:10px;color:var(--gray);font-weight:700}
+table tr.total-row td{font-weight:700;background:var(--taupe);border-top:2px solid var(--nav)}
+td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600}td.flat{color:var(--gray)}
+.note{background:var(--taupe);border-left:3px solid var(--green);padding:9px 12px;border-radius:0 6px 6px 0;font-size:12px;margin:8px 0}
+.controls{display:flex;gap:10px;align-items:center;margin:8px 0 12px;flex-wrap:wrap}
+.controls label{font-size:11px;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.controls select{font-family:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--lgray);border-radius:6px;background:#fff;color:var(--nav);cursor:pointer}
+.tabnav{display:flex;gap:4px;background:#fff;border:1px solid var(--lgray);border-radius:10px;padding:4px;margin:12px 0 18px}
+.tabbtn{flex:1;padding:10px 16px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:var(--body);font-weight:500;font-size:13px;font-family:inherit;transition:all .15s;text-transform:uppercase;letter-spacing:.05em}
+.tabbtn.active{background:var(--nav);color:var(--yellow);font-weight:700}
+.tabpanel{display:none}.tabpanel.active{display:block}
+.insight{background:#fff;border:1px solid var(--lgray);border-top:3px solid var(--txtgr);border-radius:12px;padding:16px 20px;box-shadow:var(--shadow);margin-bottom:12px}
+.insight .hd{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.insight .icn{font-size:17px;line-height:1}
+.insight .ttl{font-weight:700;font-size:14px;color:var(--nav)}
+.insight .bd{font-size:13px;color:var(--body);line-height:1.65}
+.insight.blue{border-top-color:var(--blue)}
+.insight.green{border-top-color:var(--green)}
+.insight.txtgr{border-top-color:var(--txtgr)}
+.insight.warn{border-top-color:var(--warn)}
+.insight.bad{border-top-color:var(--bad)}
+.insight.dkgr{border-top-color:var(--dkgrn)}
+.rec{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--lgray)}
+.rec:last-child{border-bottom:none}
+.rec .pr{font-size:10px;font-weight:700;color:var(--nav);border-radius:4px;padding:3px 10px;white-space:nowrap;letter-spacing:.02em;margin-top:2px}
+.rec.high .pr{background:var(--yellow)}
+.rec.med  .pr{background:var(--green)}
+.rec.low  .pr{background:var(--lgray)}
+.rec .bd{font-size:13px;color:var(--body);line-height:1.6}
+.err{background:#FDECEB;border:1px solid #C4391B;color:#8C2111;padding:10px 14px;border-radius:8px;font-size:12px;margin:8px 0;display:none}
+.err.on{display:block}
+.subhead{font-size:12px;color:var(--muted);margin:2px 0 14px}
+.footer-note{margin-top:30px;padding-top:16px;border-top:1px solid var(--lgray);color:var(--gray);font-size:11px}
+</style>
+</head>
+<body>
+
+<div id="err-banner" class="err"></div>
+
+<div class="header-wrap">
+  <div>
+    <div class="eyebrow">Vouch · ESC Marketing</div>
+    <h1>ESC TOF Dashboard</h1>
+    <div class="muted" style="margin-top:4px">Weighted attribution · volume × quality × goals · Ambition Insured.™</div>
+  </div>
+  <div class="header-meta">
+    <div><strong id="hdr-window">Loading…</strong></div>
+    <div id="hdr-rows" class="small"></div>
+    <div id="hdr-generated" class="small"></div>
+  </div>
+</div>
+<div class="brand-stripe"></div>
+
+<div class="eyebrow" style="margin-bottom:6px">Executive Summary · Current Month-to-Date</div>
+<div class="tile-row" id="exec-tiles"></div>
+
+<div class="tabnav">
+  <button class="tabbtn active" data-tab="t-metrics">Metrics</button>
+  <button class="tabbtn" data-tab="t-trends">Monthly Trends</button>
+  <button class="tabbtn" data-tab="t-insights">Insights</button>
+</div>
+
+<div id="t-metrics" class="tabpanel active">
+  <h2>Actuals vs Goal</h2>
+  <div class="controls">
+    <label for="goal-view">View</label>
+    <select id="goal-view">
+      <option value="month">Current Month</option>
+      <option value="ytd">YTD</option>
+    </select>
+    <label for="goal-mode">Comparison</label>
+    <select id="goal-mode">
+      <option value="projected">Projected (pacing-adj.)</option>
+      <option value="mtd">As-of-today actual</option>
+    </select>
+    <span class="small" id="goal-context"></span>
+  </div>
+  <div class="card"><div class="canvas-wrap tall"><canvas id="goal-chart"></canvas></div></div>
+  <div class="card"><table id="goal-table"></table></div>
+
+  <h2>Channel Scorecard · Volume × Quality</h2>
+  <div class="note">Weighted attribution. Revenue figures are estimates using a 17% commission assumption on bound premium. Use the Window dropdown to slice the scorecard across time.</div>
+  <div class="controls">
+    <label for="sc-window">Window</label>
+    <select id="sc-window">
+      <option value="ltm" selected>LTM · Trailing 13 months</option>
+      <option value="mtd">Current month (MTD)</option>
+      <option value="qtd">Current quarter (QTD)</option>
+      <option value="ytd">YTD</option>
+    </select>
+    <span class="small" id="sc-context"></span>
+  </div>
+  <div class="card"><table id="scorecard-table"></table></div>
+  <div class="card-grid">
+    <div class="card"><h3 id="vol-title">Volume · weighted madlibs</h3><div class="canvas-wrap"><canvas id="vol-chart"></canvas></div></div>
+    <div class="card"><h3 id="qual-title">Quality · bind rate &amp; rev / bind</h3><div class="canvas-wrap"><canvas id="qual-chart"></canvas></div></div>
+  </div>
+
+  <h2>Paid Search Deep-Dive</h2>
+  <div class="note">Google Ads layered on top of the weighted-attribution view.</div>
+  <div class="tile-row ps" id="ps-kpis"></div>
+  <div class="card-grid">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h3 style="margin:0">Weekly cost vs Ads madlibs</h3>
+        <select id="ps-wk-window" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:6px;background:#fff;color:var(--nav);cursor:pointer">
+          <option value="8">Last 8 wks</option>
+          <option value="18" selected>Last 18 wks</option>
+          <option value="26">Last 26 wks</option>
+          <option value="52">Last 52 wks</option>
+        </select>
+      </div>
+      <div class="canvas-wrap" style="margin-top:8px"><canvas id="ps-weekly"></canvas></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <h3 style="margin:0" id="ps-m-title">CP / ML over time (monthly)</h3>
+        <select id="ps-m-metric" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:6px;background:#fff;color:var(--nav);cursor:pointer">
+          <option value="cp_ml" selected>CP / ML</option>
+          <option value="cpc">CPC</option>
+          <option value="cvr">CVR (click → ML)</option>
+          <option value="ctr">CTR</option>
+          <option value="cost">Cost</option>
+          <option value="imp">Impressions</option>
+          <option value="clicks">Clicks</option>
+          <option value="madlibs">Madlibs (Ads)</option>
+        </select>
+      </div>
+      <div class="canvas-wrap" style="margin-top:8px"><canvas id="ps-cpml"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div id="t-trends" class="tabpanel">
+  <h2>Monthly Submit Volume by Channel</h2>
+  <div class="subhead">Trailing 13 months · weighted attribution</div>
+  <div class="controls">
+    <label for="trend-metric">Metric</label>
+    <select id="trend-metric">
+      <option value="madlibs">Weighted madlibs</option>
+      <option value="binds">Weighted binds</option>
+      <option value="premium">Bound premium</option>
+      <option value="bind_rate">Bind rate %</option>
+    </select>
+    <label for="trend-mode">View</label>
+    <select id="trend-mode">
+      <option value="lines">Lines (per bucket)</option>
+      <option value="stack">Stacked bars</option>
+    </select>
+  </div>
+  <div class="card"><div class="canvas-wrap tall"><canvas id="trend-chart"></canvas></div></div>
+
+  <h2>Submit → Quote Rate Trend</h2>
+  <div class="subhead">Per-bucket S→Q ratio, monthly</div>
+  <div class="controls">
+    <label for="s2q-tf">Timeframe</label>
+    <select id="s2q-tf">
+      <option value="13" selected>All 13 months</option>
+      <option value="6">Last 6 months</option>
+      <option value="qtd">Current quarter</option>
+    </select>
+  </div>
+  <div class="card"><div class="canvas-wrap tall"><canvas id="s2q-chart"></canvas></div></div>
+
+  <h2>Quote → Bind Rate Trend</h2>
+  <div class="subhead">Per-bucket Q→B ratio, monthly</div>
+  <div class="controls">
+    <label for="q2b-tf">Timeframe</label>
+    <select id="q2b-tf">
+      <option value="13" selected>All 13 months</option>
+      <option value="6">Last 6 months</option>
+      <option value="qtd">Current quarter</option>
+    </select>
+  </div>
+  <div class="card"><div class="canvas-wrap tall"><canvas id="q2b-chart"></canvas></div></div>
+</div>
+
+<div id="t-insights" class="tabpanel">
+  <h2 id="vert-h2">Quote Rate by Underwriting Vertical</h2>
+  <div class="controls">
+    <label for="vert-period">Period</label>
+    <select id="vert-period">
+      <option value="current_month" selected>Current Month</option>
+      <option value="prior_month">Prior Month</option>
+      <option value="ltm">LTM (all 13 mo)</option>
+      <option value="ytd">YTD</option>
+    </select>
+    <span class="small" id="vert-sub">Loading…</span>
+  </div>
+  <div class="card"><div class="canvas-wrap xl"><canvas id="vert-chart"></canvas></div></div>
+
+  <h2>Channel Insights · Current Month</h2>
+  <div class="subhead">Where's the premium opportunity vs historical baselines, and what lever closes it?</div>
+  <div id="insights-cards"></div>
+
+  <h2>Priority Actions · Ranked by Premium Recovery</h2>
+  <div class="subhead">Largest dollars on the table this month, top to bottom</div>
+  <div class="card" id="recs-card"></div>
+</div>
+
+<div class="footer-note" id="foot">Loading…</div>
+
+<script id="dash-data" type="application/json">
+{"generated_at":"2026-05-01T13:15:36Z","window":{"min":"2025-04-01","max":"2026-04-30","rows":7001},"bucket_order":["Organic","Paid Search","YC Continuity","Partner-Named","Partner-Other","Other"],"commission_rate":0.17,"scorecard_ltm":[{"b":"Organic","m":2347.5,"q":1685.17,"bn":514.17,"p":2249447.03},{"b":"Paid Search","m":743.17,"q":546.5,"bn":208.17,"p":944912.6},{"b":"YC Continuity","m":403.67,"q":338.42,"bn":185.0,"p":786562.33},{"b":"Partner-Named","m":776.83,"q":587.25,"bn":212.17,"p":772784.66},{"b":"Partner-Other","m":1332.17,"q":932.33,"bn":473.5,"p":1825984.43},{"b":"Other","m":1346.67,"q":941.33,"bn":376.0,"p":1930221.4},{"b":"Total","m":7001,"q":5073,"bn":1992,"p":8658303.05}],"goal_month":[{"b":"Organic","a":423.17,"g":101,"proj":423.17,"day":30,"dim":30},{"b":"Paid Search","a":99.83,"g":37,"proj":99.83,"day":30,"dim":30},{"b":"YC Continuity","a":29.0,"g":39,"proj":29.0,"day":30,"dim":30},{"b":"Partner-Named","a":98.0,"g":53,"proj":98.0,"day":30,"dim":30},{"b":"Partner-Other","a":123.33,"g":104,"proj":123.33,"day":30,"dim":30},{"b":"Other","a":124.67,"g":140,"proj":124.67,"day":30,"dim":30},{"b":"Total","a":901,"g":474,"proj":901.0,"day":30,"dim":30}],"goal_ytd":[{"b":"Organic","a":1154.17,"g":395,"proj":1154.17},{"b":"Paid Search","a":335.17,"g":148,"proj":335.17},{"b":"YC Continuity","a":127.0,"g":153,"proj":127.0},{"b":"Partner-Named","a":344.92,"g":209,"proj":344.92},{"b":"Partner-Other","a":440.92,"g":407,"proj":440.92},{"b":"Other","a":525.83,"g":551,"proj":525.83},{"b":"Total","a":2939,"g":1863,"proj":2939.0}],"ytd":{"actuals":{"madlibs":2939,"quotes":2067,"binds":711,"premium":2642987.63,"revenue":449307.9},"projected":{"madlibs":2939.0,"quotes":2067.0,"binds":711.0,"premium":2642987.63,"revenue":449307.9},"goals":{"madlibs":1863,"quotes":1408,"binds":652,"premium":3657431.0,"revenue":721849.0},"pct":{"madlibs":1.5776,"madlibs_proj":1.5776,"quotes":1.468,"quotes_proj":1.468,"binds":1.0905,"binds_proj":1.0905,"premium":0.7226,"premium_proj":0.7226,"revenue":0.6224,"revenue_proj":0.6224},"through_month":"Apr","year":2026},"mom_yoy":{"current":{"ym":"2026-04","m":901,"bn":179,"p":585716.97,"day":30},"pm":{"ym":"2026-03","m":772,"bn":193,"p":698608.44,"dm":0.1671,"db":-0.0725},"py":{"ym":"2025-04","m":412,"bn":154,"p":671921.55,"dm":1.1869,"db":0.1623}},"qoq":{"q":"Q2","a":901,"g":1422,"pct":0.6336},"monthly":{"Organic":[[104.83,32.0,141392.42,67.0],[111.0,29.17,148971.47,80.0],[137.83,45.83,285063.05,97.33],[157.67,35.0,124402.89,115.83],[137.33,41.83,131088.57,93.83],[134.0,28.5,148528.96,95.0],[131.83,25.0,133723.5,100.33],[138.33,30.0,164981.0,102.0],[137.5,29.0,136011.68,102.0],[212.33,39.33,181548.87,150.83],[195.17,47.0,187653.62,143.67],[323.5,65.5,256473.5,242.0],[423.17,66.0,209607.5,294.33]],"Paid Search":[[52.17,15.67,66852.64,30.0],[41.5,12.83,69677.13,33.5],[36.0,10.5,102374.5,27.0],[34.67,10.5,19115.78,25.83],[43.33,10.33,39730.34,33.83],[54.0,16.5,79906.24,38.5],[57.83,16.0,48583.4,40.33],[45.0,10.5,85897.5,37.5],[43.0,13.5,70690.5,35.67],[75.17,22.33,87664.78,52.17],[57.67,11.5,39771.87,37.67],[102.5,38.5,177381.91,78.5],[99.83,19.5,57266.0,76.0]],"YC Continuity":[[30.5,17.0,83483.45,24.5],[34.0,19.33,91573.08,33.0],[30.0,17.17,78609.34,27.0],[33.67,22.5,104127.17,29.67],[32.75,17.5,105153.44,27.25],[31.5,13.0,52426.99,25.25],[30.5,13.5,49896.49,27.5],[26.25,11.25,29334.49,21.25],[27.5,14.0,52722.0,24.0],[33.5,10.5,57966.34,27.0],[27.25,9.75,22754.49,24.25],[37.25,10.5,40561.05,26.25],[29.0,9.0,17954.0,21.5]],"Partner-Named":[[35.25,13.25,63999.42,26.25],[43.42,10.5,25485.51,37.58],[40.92,7.83,18813.06,33.08],[50.5,15.5,50373.02,42.0],[35.0,10.25,44085.75,26.0],[63.5,16.0,44805.03,48.5],[60.33,10.5,49149.96,43.5],[55.08,13.0,40638.47,38.75],[47.92,17.0,149992.43,36.42],[71.25,21.5,77115.14,56.25],[90.75,32.25,79624.54,65.75],[84.92,24.08,73439.33,66.17],[98.0,20.5,55262.98,67.0]],"Partner-Other":[[94.92,40.92,157523.88,60.25],[106.58,39.17,179930.33,79.92],[104.75,38.33,243064.76,80.08],[102.83,40.5,157094.28,76.5],[94.58,30.58,136979.37,74.08],[88.5,33.5,131130.32,61.25],[110.67,42.0,115784.14,81.0],[88.5,36.75,109036.9,66.0],[98.42,38.5,132006.47,72.08],[109.08,33.33,115430.79,63.58],[102.17,30.5,139852.19,68.17],[106.33,36.42,86934.03,68.58],[123.33,33.0,121216.95,80.83]],"Other":[[88.33,33.17,140565.64,69.0],[84.5,29.0,147679.73,61.0],[93.5,25.33,192019.08,72.5],[95.67,34.0,196166.58,79.17],[75.0,21.5,129951.37,53.0],[95.5,35.5,178689.0,68.5],[111.83,29.0,142472.49,69.33],[91.83,25.5,179297.92,64.5],[83.67,18.0,91137.0,55.83],[111.67,38.0,199713.47,79.17],[139.0,32.0,131904.0,81.5],[150.5,25.0,77447.6,100.5],[124.67,30.0,123177.5,86.33]]},"yms":["2025-04","2025-05","2025-06","2025-07","2025-08","2025-09","2025-10","2025-11","2025-12","2026-01","2026-02","2026-03","2026-04"],"rates":{"Organic":[[63.9,47.8,30.5],[72.1,36.5,26.3],[70.6,47.1,33.3],[73.5,30.2,22.2],[68.3,44.6,30.5],[70.9,30.0,21.3],[76.1,24.9,19.0],[73.7,29.4,21.7],[74.2,28.4,21.1],[71.0,26.1,18.5],[73.6,32.7,24.1],[74.8,27.1,20.2],[69.6,22.4,15.6]],"Paid Search":[[57.5,52.2,30.0],[80.7,38.3,30.9],[75.0,38.9,29.2],[74.5,40.6,30.3],[78.1,30.5,23.8],[71.3,42.9,30.6],[69.7,39.7,27.7],[83.3,28.0,23.3],[82.9,37.9,31.4],[69.4,42.8,29.7],[65.3,30.5,19.9],[76.6,49.0,37.6],[76.1,25.7,19.5]],"YC Continuity":[[80.3,69.4,55.7],[97.1,58.6,56.9],[90.0,63.6,57.2],[88.1,75.8,66.8],[83.2,64.2,53.4],[80.2,51.5,41.3],[90.2,49.1,44.3],[81.0,52.9,42.9],[87.3,58.3,50.9],[80.6,38.9,31.3],[89.0,40.2,35.8],[70.5,40.0,28.2],[74.1,41.9,31.0]],"Partner-Named":[[74.5,50.5,37.6],[86.6,27.9,24.2],[80.9,23.7,19.1],[83.2,36.9,30.7],[74.3,39.4,29.3],[76.4,33.0,25.2],[72.1,24.1,17.4],[70.3,33.5,23.6],[76.0,46.7,35.5],[78.9,38.2,30.2],[72.5,49.0,35.5],[77.9,36.4,28.4],[68.4,30.6,20.9]],"Partner-Other":[[63.5,67.9,43.1],[75.0,49.0,36.7],[76.5,47.9,36.6],[74.4,52.9,39.4],[78.3,41.3,32.3],[69.2,54.7,37.9],[73.2,51.9,38.0],[74.6,55.7,41.5],[73.2,53.4,39.1],[58.3,52.4,30.6],[66.7,44.7,29.9],[64.5,53.1,34.2],[65.5,40.8,26.8]],"Other":[[78.1,48.1,37.5],[72.2,47.5,34.3],[77.5,34.9,27.1],[82.8,42.9,35.5],[70.7,40.6,28.7],[71.7,51.8,37.2],[62.0,41.8,25.9],[70.2,39.5,27.8],[66.7,32.2,21.5],[70.9,48.0,34.0],[58.6,39.3,23.0],[66.8,24.9,16.6],[69.3,34.7,24.1]]},"verticals":[["Commerce & Marketplace",75,89.3],["Enterprise Software & Data",255,88.2],["Fintech",67,86.6],["Life Sciences",68,79.4],["Digital Content & Media",63,79.4],["Hardware",48,72.9],["Other",187,65.8],["Physical Products",28,57.1],["Unknown",110,0.0]],"verticals_by_period":{"current_month":[["Commerce & Marketplace",75,89.3],["Enterprise Software & Data",255,88.2],["Fintech",67,86.6],["Life Sciences",68,79.4],["Digital Content & Media",63,79.4],["Hardware",48,72.9],["Other",187,65.8],["Physical Products",28,57.1],["Unknown",110,0.0]],"prior_month":[["Enterprise Software & Data",236,94.9],["Commerce & Marketplace",66,84.8],["Digital Content & Media",65,84.6],["Fintech",64,82.8],["Hardware",31,77.4],["Life Sciences",70,74.3],["Other",152,67.8],["Physical Products",30,56.7],["Unknown",94,0.0]],"ltm":[["Enterprise Software & Data",1999,92.2],["Commerce & Marketplace",489,88.3],["Life Sciences",697,87.1],["Digital Content & Media",547,85.2],["Fintech",581,81.2],["Hardware",370,77.6],["Other",1308,62.6],["Physical Products",284,51.1],["Unknown",720,0.0]],"ytd":[["Enterprise Software & Data",850,90.8],["Commerce & Marketplace",221,86.4],["Fintech",218,84.9],["Digital Content & Media",217,84.3],["Life Sciences",254,79.9],["Hardware",133,76.7],["Other",568,65.7],["Physical Products",109,53.2],["Unknown",369,0.0]],"labels":{"current_month":"2026-04","prior_month":"2026-03","ltm":"2025-04\u20132026-04","ytd":"Jan\u2013Apr 2026"}},"ps_weekly":[["2025-03-08",10090,33],["2025-03-15",10972,38],["2025-03-22",11232,40],["2025-03-29",7906,31],["2025-04-05",1476,9],["2025-04-12",1645,7],["2025-04-19",1572,11],["2025-04-26",1219,11],["2025-05-03",1727,8],["2025-05-10",1773,12],["2025-05-17",2270,19],["2025-05-24",1994,10],["2025-05-31",2448,7],["2025-06-07",2448,11],["2025-06-14",2335,15],["2025-06-21",1484,10],["2025-06-28",1288,11],["2025-07-05",1638,15],["2025-07-12",1972,9],["2025-07-19",2081,7],["2025-07-26",2374,14],["2025-08-02",3177,15],["2025-08-09",3028,13],["2025-08-16",1468,15],["2025-08-23",1645,19],["2025-08-30",1401,13],["2025-09-06",1902,14],["2025-09-13",2054,13],["2025-09-20",2654,27],["2025-09-27",2112,13],["2025-10-04",2312,26],["2025-10-11",2306,19],["2025-10-18",2021,8],["2025-10-25",2451,16],["2025-11-01",2019,22],["2025-11-08",2223,18],["2025-11-15",2440,14],["2025-11-22",1254,10],["2025-11-29",2121,16],["2025-12-06",1612,11],["2025-12-13",2129,18],["2025-12-27",2207,7],["2026-01-10",3268,24],["2026-01-24",2187,14],["2026-02-07",6684,13],["2026-02-21",2417,14],["2026-03-07",4433,35],["2026-03-21",3113,25],["2026-03-28",3334,27],["2026-04-04",4439,31],["2026-04-11",3623,31],["2026-04-18",4012,27]],"ps_monthly":[["2025-04",5843,5912,8.4,155.58,5.4,12.05,704,38],["2025-05",8500,10212,14.46,182.36,7.93,8.31,706,56],["2025-06",7582,7555,13.96,160.74,8.69,7.14,541,47],["2025-07",8820,8065,14.33,179.22,7.99,6.38,563,45],["2025-08",10919,10719,12.15,142.92,8.5,8.08,882,75],["2025-09",8122,8722,12.92,130.18,9.93,8.31,675,67],["2025-10",8719,9090,12.37,131.74,9.39,8.43,735,69],["2025-11",10494,10057,10.9,125.71,8.67,8.8,923,80],["2025-12",5357,5948,12.26,165.22,7.42,9.05,485,36],["2026-01",5367,5455,11.99,143.55,8.35,8.48,455,38],["2026-02",5116,9101,19.91,337.07,5.91,8.93,457,27],["2026-03",4768,10880,12.43,125.06,9.94,18.35,875,87],["2026-04",6297,12074,14.19,135.66,10.46,13.51,851,89]],"insights_cards":[{"cls":"blue","icon":"\ud83d\udca0","title":"Organic \u00b7 $210K Apr premium vs ~$173K monthly baseline \u2014 ~$117K opportunity","body":"<strong>423 weighted madlibs</strong> \u2014 your biggest volume channel \u2014 but bind rate collapsed to <strong>15.6%</strong> vs the LTM baseline of <strong>21.9%</strong>. Only 66 binds produced $210K \u2014 on par-level bind rate at current volume you'd expect ~93 binds (~+27). $/bind also dropped to <strong>$3,176</strong> vs LTM <strong>$4,375</strong>, so deal size is shrinking alongside close rate. <br><br><strong>Premium lever:</strong> ~229 quoted-but-unbound Organic apps this month. Stand up a BDR or email nurture focused on the top-quoting verticals (Enterprise Software, Life Sciences, Fintech \u2014 all 80%+ quote rates). Recovering bind rate to 22% on this cohort alone would add ~$117K in the next ~30-day reporting window."},{"cls":"txtgr","icon":"\ud83d\udfe2","title":"Paid Search \u00b7 Apr regressed to $57K; 2026-03 hit $177K on similar spend \u2014 ~$120K recoverable","body":"We <em>know</em> what a great Paid Search month looks like \u2014 <strong>2026-03</strong>: 102 madlibs \u2192 38 binds \u2192 <strong>$177K premium</strong>. Apr: 100 madlibs \u2192 20 binds \u2192 <strong>$57K</strong>. S\u2192Q held (76.1% vs LTM 73.5%), so the leads are still quoting \u2014 <strong>Q\u2192B collapsed</strong> to 25.7% (vs 2026-03 ~48%). CPC is flat at ~$13\u201314, so the regression isn't efficiency. <br><br><strong>Premium lever:</strong> diff the campaign state (keywords, ad copy, landing pages, audience/location settings) between 2026-03 and Apr. Whatever changed downstream is costing us ~$120K per month. If CAC/CPC stays stable and bind rate recovers to 30%+, goal should be raised above 37/mo."},{"cls":"green","icon":"\ud83c\udf31","title":"YC Continuity \u00b7 ONLY miss on goal (74% projected) \u2014 ~$19K premium at stake","body":"YC is your quality king \u2014 LTM bind rate <strong>45.8%</strong>, LTM $/bind <strong>$4,252</strong>. But Apr: only <strong>29 madlibs</strong> vs 39 goal \u2014 the <em>only</em> channel projected to miss. Every incremental YC referral is worth ~$1,949 in expected premium. <br><br><strong>Premium lever:</strong> pure pipeline activation. Work the YC partnership for a batch-day push, founder-community outreach, or a co-marketing moment. Closing the 10-madlib goal gap lands ~$19K in additional premium \u2014 100% upside since YC converts consistently."},{"cls":"green","icon":"\ud83e\udd1d","title":"Partner-Named \u00b7 Q\u2192B slipped from Feb peak (49%) to 31% \u2014 ~$52K recoverable","body":"Carta + Vanta + Stripe drove <strong>98 madlibs</strong> in Apr (+ vs baseline) but only 20 binds (bind rate <strong>20.9%</strong> vs Feb's <strong>35.5%</strong>). $/bind came in at <strong>$2,696</strong> vs LTM <strong>$3,642</strong>. <br><br><strong>Premium lever:</strong> segment by partner. Stripe has historically driven ~60% of this bucket \u2014 if its quote-to-bind deteriorated, that's the one to fix. Check whether the drop is timing (late-April quotes that haven't bound yet) or a real quality shift. Restoring to Feb's close rate on Apr's volume recovers ~$52K."},{"cls":"txtgr","icon":"\ud83c\udfe2","title":"Partner-Other \u00b7 BIND RATE CRASH: 26.8% vs 35.5% LTM \u2014 ~$42K premium gap (biggest single-channel opportunity)","body":"This is the biggest premium gap in the portfolio this month. <strong>123 madlibs</strong> \u2014 similar volume to recent months \u2014 but bind rate <strong>halved</strong> from the LTM norm of 35.5% to <strong>26.8%</strong>. S\u2192Q also fell (65.5% vs LTM 70.0%), which means lead quality dropped upstream, not just at the close. <br><br><strong>Premium lever:</strong> pull the partner-source breakdown for this bucket. WeWork has historically been the quotability drag; if WeWork's share of volume jumped in Apr, that explains both metrics falling together. Rebalancing back to the LTM partner mix would recover ~$42K in premium (+11 binds)."},{"cls":"bad","icon":"\ud83d\udd36","title":"Other \u00b7 Still best $/bind ($4,106) but projecting only 89% of goal \u2014 volume is the gap","body":"Highest-premium channel per bind at <strong>$4,106</strong> (Apr) vs <strong>$5,134</strong> LTM \u2014 still the biggest individual deals in the portfolio. But only <strong>125 madlibs</strong> vs 140 goal (projecting 125). Underlying rates held \u2014 S\u2192Q 69.3%, bind rate 24.1% \u2014 which means the gap is pure volume, not quality. <br><br><strong>Premium lever:</strong> segment this bucket. 'Other' pools Events, Prospecting, Paid Placement, Paid Social, Direct, Marketing Emails, Other Referral, None, and Ambiguous \u2014 all with very different economics. Events and Prospecting tend to be the highest-intent sources; if event cadence dropped in Apr, that's the immediate fix. Closing the goal gap at LTM economics = ~$22K premium."}],"recommendations":[{"pri":"high","body":"<strong>Fix Partner-Other bind rate \u2014 biggest single-channel premium gap this month (~$42K).</strong> Bind rate halved from LTM baseline. Pull the partner-source breakdown (WeWork vs. others) for Apr; if WeWork's share of volume jumped, rebalance. Also check whether any single partner shipped a policy change that pushed leads off-ICP. This is the fastest dollar recovery on the board."},{"pri":"high","body":"<strong>Recover Paid Search to its 2026-03 playbook (~$120K recoverable).</strong> Diff the keyword mix, ad copy, landing pages, audience/location settings between 2026-03 and Apr. CPC hasn't moved, so the regression is downstream of spend. If the configuration is recoverable, we already know the ceiling. Once recovered, raise the monthly goal above 37 \u2014 the channel has consistently outperformed it."},{"pri":"high","body":"<strong>Launch an Organic post-quote nurture (~$117K annualized uplift at ~22% bind rate).</strong> The non-bound quoted pool is the single largest conversion lever in the funnel \u2014 150+ apps in Apr alone. Target Enterprise Software, Life Sciences, and Fintech first (80%+ quote rates). A 3-touch BDR sequence + a branded 'ready-to-bind' email can reasonably add 4\u20136 binds per month on Organic volume."},{"pri":"med","body":"<strong>Activate YC pipeline (~$19K on the table) \u2014 the only channel missing goal.</strong> YC is ~4x more likely to bind than an average Organic lead. Work the YC partnership team for a batch-day campaign, 'Insurance 101 for Founders' content placement, or a co-sponsored event. Volume is the only lever \u2014 quality is already best-in-class."},{"pri":"med","body":"<strong>Stripe quality check for Partner-Named (~$52K if Feb close rate returns).</strong> Q\u2192B slipped ~5pp vs February. Stripe drives ~60% of this bucket historically \u2014 ask sales whether Stripe-sourced quotes specifically closed worse this month. If yes, that's one partner-ops conversation, not a funnel redesign."},{"pri":"low","body":"<strong>Segment 'Other' before Q3 goals get set (~$22K goal-miss gap this month).</strong> The bucket holds 9 sub-channels with completely different economics. Break out Events, Prospecting, Paid Placement, and Direct so we can diagnose when one drops. Events in particular tend to produce the highest-premium binds \u2014 if event cadence slipped, we want to know immediately, not at quarter-end."}]}
+</script>
+
+<script>
+(function(){
+  const err=(m)=>{const e=document.getElementById('err-banner');e.className='err on';e.textContent='Dashboard load error: '+m;console.error(m);};
+  let D;
+  try{
+    D = JSON.parse(document.getElementById('dash-data').textContent);
+  }catch(e){
+    err('Failed to parse data JSON — '+e.message);return;
+  }
+  const BUCKETS=D.bucket_order;
+  const COLOR={"Organic":"#50EAF2","Paid Search":"#A8A8A8","YC Continuity":"#2CB89A","Partner-Named":"#3BE0AD","Partner-Other":"#19A078","Other":"#1A5745","Total":"#0F1C2C"};
+  const fmt=(n,d=0)=>n==null||isNaN(+n)?'—':(+n).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+  const fmtM=(n,d=0)=>n==null||isNaN(+n)?'—':'$'+(+n).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+  const fmtP=(n,d=1)=>n==null||isNaN(+n)?'—':(n*100).toFixed(d)+'%';
+  const pctStr=x=>x==null?'—':((1+x)*100).toFixed(1)+'%';
+  const pctCls=x=>x==null||Math.abs(x)<0.005?'flat':x>0?'up':'down';
+  const rateColor=(v,t)=>v>=t[0]?'#3BE0AD':v>=t[1]?'#19A078':v>=t[2]?'#BFA836':'#C4391B';
+  if(typeof Chart==='undefined'){err('Chart.js failed to load — check network');return;}
+  Chart.defaults.font.family='"GT America",Arial,Helvetica,sans-serif';
+  Chart.defaults.color='#0F1C2C';Chart.defaults.borderColor='#EBEAE8';
+
+  try{
+    document.getElementById('hdr-window').textContent='Data: '+D.window.min+' → '+D.window.max;
+    document.getElementById('hdr-rows').textContent=D.window.rows.toLocaleString()+' rows · weighted attribution';
+    document.getElementById('hdr-generated').textContent='Generated '+D.generated_at.replace('T',' ').replace('Z',' UTC');
+    const t=D.scorecard_ltm.find(r=>r.b==='Total');
+    document.getElementById('foot').innerHTML='Built for Clark · Vouch ESC · commission '+Math.round(D.commission_rate*100)+'%. LTM totals: '+fmt(t.m)+' madlibs, '+fmt(t.bn)+' binds, '+fmtM(t.p)+' bound premium (~'+fmtM(t.p*D.commission_rate)+' est. revenue).';
+    // vert-sub is set by renderVertical() below
+  }catch(e){err('header init — '+e.message);}
+
+  try{
+    const T=D.mom_yoy;const Gm=D.goal_month.find(r=>r.b==='Total');const Q=D.qoq;const Y=D.ytd;
+    const tiles=[
+      {lbl:'Madlibs YoY (MTD vs LY)',val:pctStr(T.py.dm),sub:fmt(T.current.m)+' vs '+fmt(T.py.m)+' ('+T.py.ym+')',delta:T.py.dm,dL:'YoY'},
+      {lbl:'Madlibs MTD',val:fmt(T.current.m),sub:'of '+Gm.g+' goal · proj '+fmt(Gm.proj),delta:T.pm.dm,dL:'MoM'},
+      {lbl:'% Monthly Goal (Proj)',val:fmtP(Gm.proj/Gm.g,0),sub:fmt(Gm.a)+' MTD · '+fmt(Gm.proj)+' proj'},
+      {lbl:Q.q+' Goal (QTD)',val:fmtP(Q.a/Q.g,0),sub:fmt(Q.a)+' / '+fmt(Q.g)+' madlibs'},
+      {lbl:'YTD Bound Premium',val:fmtM(Y.actuals.premium,0),sub:'Jan–'+Y.through_month+' '+Y.year+' · '+fmtM(Y.goals.premium,0)+' goal'},
+      {lbl:'% to YTD Premium Goal',val:fmtP(Y.pct.premium,0),sub:'Proj EOY-rate: '+fmtP(Y.pct.premium_proj,0)},
+      {lbl:'YTD Bound Revenue (Est.)',val:fmtM(Y.actuals.revenue,0),sub:'@ '+Math.round(D.commission_rate*100)+'% commission · '+fmtM(Y.goals.revenue,0)+' goal'},
+      {lbl:'% to YTD Revenue Goal',val:fmtP(Y.pct.revenue,0),sub:'Proj EOY-rate: '+fmtP(Y.pct.revenue_proj,0)}
+    ];
+    document.getElementById('exec-tiles').innerHTML=tiles.map(x=>{
+      const d=x.delta==null?'':'<div class="delta '+pctCls(x.delta)+'">'+(x.dL?x.dL+' ':'')+pctStr(x.delta)+'</div>';
+      return '<div class="tile"><div class="lbl">'+x.lbl+'</div><div class="val">'+x.val+'</div><div class="sub">'+x.sub+'</div>'+d+'</div>';
+    }).join('');
+  }catch(e){err('exec tiles — '+e.message);}
+
+  document.querySelectorAll('.tabbtn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.tabbtn').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.tabpanel').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      document.getElementById(b.dataset.tab).classList.add('active');
+    });
+  });
+
+  let goalChart;
+  function renderGoal(){
+    try{
+      const view=document.getElementById('goal-view').value;
+      const mode=document.getElementById('goal-mode').value;
+      const src = view==='ytd'?D.goal_ytd:D.goal_month;
+      const aKey = mode==='projected'?'proj':'a';
+      const ctx = view==='ytd'?'YTD · Jan–'+D.window.max.slice(5,7):'Current month · through day '+(src[0].day||'')+'/'+(src[0].dim||'')+(mode==='projected'?' · projected EOM':' · MTD');
+      document.getElementById('goal-context').textContent=ctx;
+      const plot=src.filter(r=>r.b!=='Total');
+      if(goalChart)goalChart.destroy();
+      goalChart=new Chart(document.getElementById('goal-chart'),{type:'bar',data:{labels:plot.map(r=>r.b),datasets:[{label:'Actual',data:plot.map(r=>r[aKey]),backgroundColor:'#3BE0AD',borderRadius:4},{label:'Goal',data:plot.map(r=>r.g),backgroundColor:'#0F1C2C',borderRadius:4}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'top',align:'end'}},scales:{y:{beginAtZero:true,title:{display:true,text:'Madlibs'}},x:{grid:{display:false}}}}});
+      let h='<thead><tr><th>Bucket</th><th>Actual</th><th>Goal</th><th>Delta</th><th>% goal</th><th>Projected</th></tr></thead><tbody>';
+      src.forEach(r=>{const tot=r.b==='Total',a=r[aKey]||0,g=r.g||0,d=a-g,p=g?a/g:null,pr=r.proj;const pc=p==null?'flat':p>=1?'pos':'neg';h+='<tr'+(tot?' class="total-row"':'')+'><td>'+r.b+'</td><td>'+fmt(a,1)+'</td><td>'+fmt(g)+'</td><td class="'+(d>=0?'pos':'neg')+'">'+(d>=0?'+':'')+fmt(d,1)+'</td><td class="'+pc+'">'+(p!=null?fmtP(p,0):'—')+'</td><td>'+(pr!=null?fmt(pr,1):'—')+'</td></tr>';});
+      document.getElementById('goal-table').innerHTML=h+'</tbody>';
+    }catch(e){err('goal render — '+e.message);}
+  }
+  document.getElementById('goal-view').addEventListener('change',renderGoal);
+  document.getElementById('goal-mode').addEventListener('change',renderGoal);
+  renderGoal();
+
+  // --- Scorecard: dynamic window across LTM / MTD / QTD / YTD ---------
+  let volChart, qualChart;
+  function scWindowIndices(win){
+    const n=D.yms.length;
+    const latest=D.yms[n-1];
+    const [yr,mo]=latest.split('-').map(Number);
+    const qStart=Math.floor((mo-1)/3)*3+1;
+    if(win==='mtd') return [n-1];
+    if(win==='qtd') return D.yms.map((ym,i)=>{const[y,m]=ym.split('-').map(Number);return (y===yr&&m>=qStart&&m<=mo)?i:-1;}).filter(i=>i>=0);
+    if(win==='ytd') return D.yms.map((ym,i)=>ym.startsWith(String(yr))?i:-1).filter(i=>i>=0);
+    return Array.from({length:n},(_,i)=>i); // ltm = all
+  }
+  function scLabel(win){
+    const latest=D.yms[D.yms.length-1];
+    const [yr,mo]=latest.split('-').map(Number);
+    const MN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const qStart=Math.floor((mo-1)/3)*3+1;
+    if(win==='mtd') return MN[mo-1]+' '+yr+' (MTD)';
+    if(win==='qtd') return 'Q'+Math.floor((mo-1)/3+1)+' '+yr+' ('+MN[qStart-1]+'–'+MN[mo-1]+')';
+    if(win==='ytd') return 'YTD '+yr+' (Jan–'+MN[mo-1]+')';
+    return 'Trailing 13 months';
+  }
+  function renderScorecard(){
+    try{
+      const win=document.getElementById('sc-window').value;
+      const idxs=scWindowIndices(win);
+      const bucketRows=BUCKETS.map(b=>{
+        let m=0,q=0,bn=0,p=0;
+        idxs.forEach(i=>{const r=D.monthly[b][i];if(r){m+=r[0];bn+=r[1];p+=r[2];q+=(r[3]||0);}});
+        return {bucket:b,madlibs:m,quotes:q,binds:bn,premium:p};
+      });
+      const total=bucketRows.reduce((a,r)=>({bucket:'Total',madlibs:a.madlibs+r.madlibs,quotes:a.quotes+r.quotes,binds:a.binds+r.binds,premium:a.premium+r.premium}),{bucket:'Total',madlibs:0,quotes:0,binds:0,premium:0});
+      const rows=[...bucketRows,total].map(r=>({
+        ...r,
+        quote_rate:r.madlibs?r.quotes/r.madlibs:null,
+        bind_rate: r.madlibs?r.binds/r.madlibs:null,
+        prem_per_bind:r.binds?r.premium/r.binds:null,
+        rev_per_bind: r.binds?r.premium*D.commission_rate/r.binds:null,
+        revenue: r.premium*D.commission_rate
+      }));
+      document.getElementById('sc-context').textContent=scLabel(win);
+      const volT=document.getElementById('vol-title');
+      const qualT=document.getElementById('qual-title');
+      if(volT)volT.textContent='Volume · weighted madlibs — '+scLabel(win);
+      if(qualT)qualT.textContent='Quality · bind rate & rev / bind — '+scLabel(win);
+      const totRow=rows[rows.length-1];
+      const avgQR=totRow.quote_rate,avgBR=totRow.bind_rate;
+      let h='<thead><tr><th>Bucket</th><th>Madlibs</th><th>Quotes</th><th>Binds</th><th>Quote rate</th><th>Bind rate</th><th>Bound premium</th><th>$/bind</th><th>Rev/Bind (Est.)</th><th>Total rev (Est.)</th></tr></thead><tbody>';
+      rows.forEach(r=>{const t=r.bucket==='Total';const qrCls=(!t&&r.quote_rate!=null&&avgQR!=null)?(r.quote_rate>=avgQR?' class="pos"':' class="neg"'):'';const brCls=(!t&&r.bind_rate!=null&&avgBR!=null)?(r.bind_rate>=avgBR?' class="pos"':' class="neg"'):'';h+='<tr'+(t?' class="total-row"':'')+'><td>'+r.bucket+'</td><td>'+fmt(r.madlibs,1)+'</td><td>'+fmt(r.quotes,1)+'</td><td>'+fmt(r.binds,1)+'</td><td'+qrCls+'>'+fmtP(r.quote_rate)+'</td><td'+brCls+'>'+fmtP(r.bind_rate)+'</td><td>'+fmtM(r.premium)+'</td><td>'+fmtM(r.prem_per_bind)+'</td><td>'+fmtM(r.rev_per_bind)+'</td><td>'+fmtM(r.revenue)+'</td></tr>';});
+      document.getElementById('scorecard-table').innerHTML=h+'</tbody>';
+      const pl=rows.filter(r=>r.bucket!=='Total');
+      const totalMadlibs=pl.reduce((s,r)=>s+r.madlibs,0);
+      if(volChart) volChart.destroy();
+      volChart=new Chart(document.getElementById('vol-chart'),{type:'doughnut',data:{labels:pl.map(r=>r.bucket),datasets:[{data:pl.map(r=>r.madlibs),backgroundColor:pl.map(r=>COLOR[r.bucket]),borderWidth:2,borderColor:'#fff'}]},options:{maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{boxWidth:12,padding:8,font:{size:11}}},tooltip:{callbacks:{label:function(ctx){const pct=totalMadlibs?(ctx.parsed/totalMadlibs*100).toFixed(1):0;return ctx.label+': '+fmt(ctx.parsed,1)+' ('+pct+'%)';}}}}}});
+      if(qualChart) qualChart.destroy();
+      qualChart=new Chart(document.getElementById('qual-chart'),{type:'bar',data:{labels:pl.map(r=>r.bucket),datasets:[{label:'Bind rate (%)',data:pl.map(r=>(r.bind_rate||0)*100),backgroundColor:'#3BE0AD',yAxisID:'y',borderRadius:4},{label:'Rev/Bind Est. ($)',data:pl.map(r=>r.rev_per_bind||0),backgroundColor:'#0F1C2C',yAxisID:'y1',borderRadius:4}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'top',align:'end'}},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'Bind rate %'}},y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:true,text:'Rev/Bind Est. ($)'}},x:{grid:{display:false}}}}});
+    }catch(e){err('scorecard — '+e.message);}
+  }
+  document.getElementById('sc-window').addEventListener('change',renderScorecard);
+  renderScorecard();
+
+  let trendChart;
+  function renderTrend(){
+    try{
+      const metric=document.getElementById('trend-metric').value;
+      const mode=document.getElementById('trend-mode').value;
+      const val=(b,i)=>{const row=D.monthly[b][i];if(!row)return 0;if(metric==='madlibs')return row[0];if(metric==='binds')return row[1];if(metric==='premium')return row[2];return row[0]?(row[1]/row[0])*100:0;};
+      const ds=BUCKETS.map(b=>({label:b,data:D.yms.map((ym,i)=>val(b,i)),backgroundColor:COLOR[b],borderColor:COLOR[b],stack:mode==='stack'?'s':undefined,borderWidth:mode==='lines'?2:0,tension:0.2,pointRadius:2}));
+      if(trendChart)trendChart.destroy();
+      trendChart=new Chart(document.getElementById('trend-chart'),{type:mode==='stack'?'bar':'line',data:{labels:D.yms,datasets:ds},options:{maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true,stacked:mode==='stack',title:{display:true,text:metric==='premium'?'$':metric==='bind_rate'?'%':'Count'}},x:{stacked:mode==='stack',grid:{display:false}}}}});
+    }catch(e){err('trend — '+e.message);}
+  }
+  document.getElementById('trend-metric').addEventListener('change',renderTrend);
+  document.getElementById('trend-mode').addEventListener('change',renderTrend);
+  renderTrend();
+
+  // --- S2Q and Q2B rate trends with timeframe dropdowns ---------------
+  function rateIndices(tf){
+    const n=D.yms.length;
+    if(tf==='6') return Array.from({length:Math.min(6,n)},(_,i)=>n-Math.min(6,n)+i);
+    if(tf==='qtd'){
+      const latest=D.yms[n-1];
+      const [yr,mo]=latest.split('-').map(Number);
+      const qStart=Math.floor((mo-1)/3)*3+1;
+      return D.yms.map((ym,i)=>{const[y,m]=ym.split('-').map(Number);return (y===yr&&m>=qStart&&m<=mo)?i:-1;}).filter(i=>i>=0);
+    }
+    return Array.from({length:n},(_,i)=>i);
+  }
+  let s2qChart,q2bChart;
+  function renderS2Q(){
+    try{
+      const idxs=rateIndices(document.getElementById('s2q-tf').value);
+      const labels=idxs.map(i=>D.yms[i]);
+      const ds=BUCKETS.map(b=>({label:b,data:idxs.map(i=>D.rates[b][i][0]),borderColor:COLOR[b],backgroundColor:COLOR[b],borderWidth:2.5,tension:0.25,pointRadius:3,fill:false}));
+      if(s2qChart) s2qChart.destroy();
+      s2qChart=new Chart(document.getElementById('s2q-chart'),{type:'line',data:{labels,datasets:ds},options:{maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{min:40,max:100,ticks:{callback:v=>v+'%'},title:{display:true,text:'Submit → Quote %'}},x:{grid:{display:false}}}}});
+    }catch(e){err('s2q — '+e.message);}
+  }
+  function renderQ2B(){
+    try{
+      const idxs=rateIndices(document.getElementById('q2b-tf').value);
+      const labels=idxs.map(i=>D.yms[i]);
+      const ds=BUCKETS.map(b=>({label:b,data:idxs.map(i=>D.rates[b][i][1]),borderColor:COLOR[b],backgroundColor:COLOR[b],borderWidth:2.5,tension:0.25,pointRadius:3,fill:false}));
+      if(q2bChart) q2bChart.destroy();
+      q2bChart=new Chart(document.getElementById('q2b-chart'),{type:'line',data:{labels,datasets:ds},options:{maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:true,max:80,ticks:{callback:v=>v+'%'},title:{display:true,text:'Quote → Bind %'}},x:{grid:{display:false}}}}});
+    }catch(e){err('q2b — '+e.message);}
+  }
+  document.getElementById('s2q-tf').addEventListener('change',renderS2Q);
+  document.getElementById('q2b-tf').addEventListener('change',renderQ2B);
+  renderS2Q(); renderQ2B();
+
+  // --- Paid Search: KPIs, weekly-chart timeframe, monthly-metric toggle ---
+  try{
+    const mo=D.ps_monthly, wk=D.ps_weekly;
+    const lm=mo[mo.length-1], pm=mo[mo.length-2];
+    const momR=(a,b)=>b?(a-b)/b:null;
+    const kpis=[
+      {lbl:'Cost (last 8 wks)',val:fmtM(wk.slice(-8).reduce((s,r)=>s+r[1],0)),sub:'Ads ML: '+fmt(wk.slice(-8).reduce((s,r)=>s+r[2],0))},
+      {lbl:'CP/ML (latest mo)',val:fmtM(lm[4]),sub:lm[0],delta:momR(lm[4],pm[4]),dL:'MoM',invert:true},
+      {lbl:'CPC (latest mo)',val:fmtM(lm[3],2),sub:lm[0],delta:momR(lm[3],pm[3]),dL:'MoM',invert:true},
+      {lbl:'CVR click→ML',val:lm[5].toFixed(1)+'%',sub:lm[0],delta:momR(lm[5],pm[5]),dL:'MoM'},
+      {lbl:'CTR',val:lm[6].toFixed(1)+'%',sub:lm[0],delta:momR(lm[6],pm[6]),dL:'MoM'},
+      {lbl:'Impressions',val:fmt(lm[1]),sub:lm[0]}
+    ];
+    document.getElementById('ps-kpis').innerHTML=kpis.map(k=>{let cls='flat';if(k.delta!=null){cls=Math.abs(k.delta)<0.005?'flat':(k.delta>0?'up':'down');}const d=k.delta==null?'':'<div class="delta '+cls+'">'+(k.dL?k.dL+' ':'')+pctStr(k.delta)+'</div>';return '<div class="tile"><div class="lbl">'+k.lbl+'</div><div class="val">'+k.val+'</div><div class="sub">'+k.sub+'</div>'+d+'</div>';}).join('');
+
+    // Weekly chart with timeframe
+    let wkChart;
+    function renderPsWeekly(){
+      const n=parseInt(document.getElementById('ps-wk-window').value,10);
+      const slice=wk.slice(-n);
+      if(wkChart) wkChart.destroy();
+      wkChart=new Chart(document.getElementById('ps-weekly'),{data:{labels:slice.map(r=>r[0]),datasets:[{type:'bar',label:'Cost ($)',data:slice.map(r=>r[1]),backgroundColor:'#1A5745',yAxisID:'y',borderRadius:3},{type:'line',label:'Ads madlibs',data:slice.map(r=>r[2]),borderColor:'#3BE0AD',backgroundColor:'#3BE0AD',yAxisID:'y1',tension:0.2,pointRadius:2}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'top',align:'end'}},scales:{y:{position:'left',beginAtZero:true,title:{display:true,text:'Cost ($)'}},y1:{position:'right',beginAtZero:true,grid:{drawOnChartArea:false},title:{display:true,text:'Ads madlibs'}},x:{ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:10},grid:{display:false}}}}});
+    }
+    document.getElementById('ps-wk-window').addEventListener('change',renderPsWeekly);
+    renderPsWeekly();
+
+    // Monthly chart with metric toggle
+    // ps_monthly row: [ym, imp, cost, cpc, cp_ml, cvr, ctr, clicks, ml]
+    const METRIC_META={
+      cp_ml:{idx:4,fmt:v=>'$'+Math.round(v).toLocaleString(),axis:'$ per madlib',title:'CP / ML over time'},
+      cpc:  {idx:3,fmt:v=>'$'+v.toFixed(2),axis:'$ per click',title:'CPC over time'},
+      cvr:  {idx:5,fmt:v=>v.toFixed(2)+'%',axis:'Click → ML (%)',title:'CVR over time'},
+      ctr:  {idx:6,fmt:v=>v.toFixed(2)+'%',axis:'Clicks / Impressions (%)',title:'CTR over time'},
+      cost: {idx:2,fmt:v=>'$'+Math.round(v).toLocaleString(),axis:'Cost ($)',title:'Monthly Cost'},
+      imp:  {idx:1,fmt:v=>Math.round(v).toLocaleString(),axis:'Impressions',title:'Monthly Impressions'},
+      clicks:{idx:7,fmt:v=>Math.round(v).toLocaleString(),axis:'Clicks',title:'Monthly Clicks'},
+      madlibs:{idx:8,fmt:v=>Math.round(v).toLocaleString(),axis:'Ads-reported madlibs',title:'Monthly Ads Madlibs'}
+    };
+    let moChart;
+    function renderPsMonthly(){
+      const key=document.getElementById('ps-m-metric').value;
+      const meta=METRIC_META[key]||METRIC_META.cp_ml;
+      const labels=mo.map(r=>r[0]);
+      const data=mo.map(r=>r[meta.idx]);
+      document.getElementById('ps-m-title').textContent=meta.title+' (monthly)';
+      if(moChart) moChart.destroy();
+      moChart=new Chart(document.getElementById('ps-cpml'),{type:'line',data:{labels,datasets:[{label:meta.title,data,borderColor:'#0F1C2C',backgroundColor:'#0F1C2C',tension:0.25,pointRadius:3}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>meta.title+': '+meta.fmt(ctx.parsed.y)}}},scales:{y:{beginAtZero:true,title:{display:true,text:meta.axis}},x:{grid:{display:false}}}}});
+    }
+    document.getElementById('ps-m-metric').addEventListener('change',renderPsMonthly);
+    renderPsMonthly();
+  }catch(e){err('paid search — '+e.message);}
+
+  // --- Vertical quote-rate with period dropdown ---------------------
+  let vertChart;
+  function renderVertical(){
+    try{
+      const period=document.getElementById('vert-period').value;
+      // Prefer verticals_by_period (new) → fall back to verticals (current month) if not present
+      const src=(D.verticals_by_period && D.verticals_by_period[period]) || D.verticals;
+      const labels=(D.verticals_by_period && D.verticals_by_period.labels) || {};
+      const V=[...src].sort((a,b)=>b[2]-a[2]);
+      const total=V.reduce((s,v)=>s+v[1],0);
+      const periodLabel={current_month:'Current Month',prior_month:'Prior Month',ltm:'LTM',ytd:'YTD'}[period]||period;
+      const labelText=labels[period]||'';
+      const sub=document.getElementById('vert-sub');
+      if(sub) sub.textContent=periodLabel+' · '+fmt(total)+' apps'+(labelText?' ('+labelText+')':'')+(period==='current_month'?' · single-month n-sizes can be noisier than LTM':'');
+      const h2=document.getElementById('vert-h2');
+      if(h2) h2.textContent='Quote Rate by Underwriting Vertical · '+periodLabel;
+      if(vertChart) vertChart.destroy();
+      vertChart=new Chart(document.getElementById('vert-chart'),{type:'bar',data:{labels:V.map(v=>v[0]),datasets:[{label:'Quote rate',data:V.map(v=>v[2]),backgroundColor:V.map(v=>rateColor(v[2]/100,[0.8,0.7,0.5])),borderRadius:4}]},options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{afterLabel:ctx=>'n = '+fmt(V[ctx.dataIndex][1])+' apps'}}},scales:{x:{beginAtZero:true,max:100,ticks:{callback:v=>v+'%'},title:{display:true,text:'Quote rate'}},y:{grid:{display:false}}}}});
+    }catch(e){err('vertical chart — '+e.message);}
+  }
+  document.getElementById('vert-period').addEventListener('change',renderVertical);
+  renderVertical();
+
+  try{
+    const CARDS=D.insights_cards||[];
+    document.getElementById('insights-cards').innerHTML=CARDS.map(c=>'<div class="insight '+c.cls+'"><div class="hd"><span class="icn">'+c.icon+'</span><span class="ttl">'+c.title+'</span></div><div class="bd">'+c.body+'</div></div>').join('');
+  }catch(e){err('insights — '+e.message);}
+
+  try{
+    const RECS=D.recommendations||[];
+    document.getElementById('recs-card').innerHTML=RECS.map(r=>'<div class="rec '+r.pri+'"><span class="pr">'+r.pri.toUpperCase()+'</span><span class="bd">'+r.body+'</span></div>').join('');
+  }catch(e){err('recommendations — '+e.message);}
+})();
+</script>
+</body>
+</html>
