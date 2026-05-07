@@ -108,8 +108,8 @@ td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600
     </select>
     <label for="goal-mode">Comparison</label>
     <select id="goal-mode">
-      <option value="projected">Projected (pacing-adj.)</option>
-      <option value="mtd">As-of-today actual</option>
+      <option value="mtd" selected>MTD (as-of-today actual)</option>
+      <option value="projected">Projected EOM (pacing-adj.)</option>
     </select>
     <span class="small" id="goal-context"></span>
   </div>
@@ -454,6 +454,10 @@ td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600
       modeSel.disabled = (view==='last30');
       const aKey = effectiveMode==='projected'?'proj':'a';
       const PM = D.partial_month || {};
+      // When showing MTD on the current-month view, prorate the goal so MTD-actual is compared to MTD-goal.
+      const proratedGoal = (view==='month' && effectiveMode==='mtd' && PM.day && PM.dim);
+      const goalScale = proratedGoal ? (PM.day / PM.dim) : 1;
+      const gKeyLabel = proratedGoal ? 'Goal (MTD prorated)' : 'Goal';
       const moLbl = (PM.month_name?PM.month_name+' '+PM.year:'Current month');
       // Header H2 + context label per view
       const h2El = document.getElementById('goal-h2');
@@ -468,15 +472,17 @@ td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600
       } else {
         h2Text = 'Actuals vs Goal · '+moLbl + (PM.is_partial?' (MTD)':'');
         ctx = moLbl+' · day '+(src[0].day||PM.day||'')+'/'+(src[0].dim||PM.dim||'')
-              +(effectiveMode==='projected'?' · projected EOM':' · MTD'+(PM.is_partial?' (partial)':''));
+              +(effectiveMode==='projected'
+                  ? ' · projected EOM vs full-month goal'
+                  : ' · MTD'+(PM.is_partial?' (partial)':'')+(proratedGoal?' · goal prorated to MTD':''));
       }
       if(h2El) h2El.textContent = h2Text;
       document.getElementById('goal-context').textContent=ctx;
       const plot=src.filter(r=>r.b!=='Total');
       if(goalChart)goalChart.destroy();
-      goalChart=new Chart(document.getElementById('goal-chart'),{type:'bar',data:{labels:plot.map(r=>r.b),datasets:[{label:'Actual',data:plot.map(r=>r[aKey]),backgroundColor:'#3BE0AD',borderRadius:4},{label:'Goal',data:plot.map(r=>r.g),backgroundColor:'#0F1C2C',borderRadius:4}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'top',align:'end'}},scales:{y:{beginAtZero:true,title:{display:true,text:'Madlibs'}},x:{grid:{display:false}}}}});
-      let h='<thead><tr><th>Bucket</th><th>Actual</th><th>Goal</th><th>Delta</th><th>% goal</th><th>Projected</th></tr></thead><tbody>';
-      src.forEach(r=>{const tot=r.b==='Total',a=r[aKey]||0,g=r.g||0,d=a-g,p=g?a/g:null,pr=r.proj;const pc=p==null?'flat':p>=1?'pos':'neg';h+='<tr'+(tot?' class="total-row"':'')+'><td>'+r.b+'</td><td>'+fmt(a,1)+'</td><td>'+fmt(g)+'</td><td class="'+(d>=0?'pos':'neg')+'">'+(d>=0?'+':'')+fmt(d,1)+'</td><td class="'+pc+'">'+(p!=null?fmtP(p,0):'—')+'</td><td>'+(pr!=null?fmt(pr,1):'—')+'</td></tr>';});
+      goalChart=new Chart(document.getElementById('goal-chart'),{type:'bar',data:{labels:plot.map(r=>r.b),datasets:[{label:'Actual',data:plot.map(r=>r[aKey]),backgroundColor:'#3BE0AD',borderRadius:4},{label:gKeyLabel,data:plot.map(r=>r.g*goalScale),backgroundColor:'#0F1C2C',borderRadius:4}]},options:{maintainAspectRatio:false,plugins:{legend:{position:'top',align:'end'}},scales:{y:{beginAtZero:true,title:{display:true,text:'Madlibs'}},x:{grid:{display:false}}}}});
+      let h='<thead><tr><th>Bucket</th><th>Actual</th><th>'+gKeyLabel+'</th><th>Delta</th><th>% goal</th><th>Projected</th></tr></thead><tbody>';
+      src.forEach(r=>{const tot=r.b==='Total',a=r[aKey]||0,g=(r.g||0)*goalScale,d=a-g,p=g?a/g:null,pr=r.proj;const pc=p==null?'flat':p>=1?'pos':'neg';h+='<tr'+(tot?' class="total-row"':'')+'><td>'+r.b+'</td><td>'+fmt(a,1)+'</td><td>'+fmt(g,1)+'</td><td class="'+(d>=0?'pos':'neg')+'">'+(d>=0?'+':'')+fmt(d,1)+'</td><td class="'+pc+'">'+(p!=null?fmtP(p,0):'—')+'</td><td>'+(pr!=null?fmt(pr,1):'—')+'</td></tr>';});
       document.getElementById('goal-table').innerHTML=h+'</tbody>';
     }catch(e){err('goal render — '+e.message);}
   }
