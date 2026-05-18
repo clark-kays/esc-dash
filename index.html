@@ -6,26 +6,29 @@
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <title>ESC Marketing Dashboard — Vouch</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Spectral:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:light;--nav:#0F1C2C;--taupe:#F7FAF2;--green:#3BE0AD;--dkgrn:#1A5745;--txtgr:#19A078;--yellow:#E8FC83;--blue:#50EAF2;--gray:#A8A8A8;--lgray:#EBEAE8;--bad:#C4391B;--good:#19A078;--warn:#BFA836;--muted:#8A9494;--body:#2B3D3D;--shadow:0 1px 2px rgba(15,28,44,.06),0 4px 12px rgba(15,28,44,.04)}
+:root{color-scheme:light;--nav:#0F1C2C;--taupe:#F0F1E5;--green:#3BE0AD;--dkgrn:#1A5745;--txtgr:#19A078;--yellow:#E8FC83;--blue:#50EAF2;--gray:#A8A8A8;--lgray:#D8D9CC;--bad:#C4391B;--good:#19A078;--warn:#BFA836;--muted:#8A9494;--body:#2B3D3D;--shadow:0 1px 2px rgba(15,28,44,.06),0 4px 12px rgba(15,28,44,.04)}
 *{box-sizing:border-box}html,body{margin:0;padding:0}
-body{background:var(--taupe);color:var(--nav);font-family:"GT America",Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;padding:22px 24px 60px;max-width:1400px;margin:0 auto}
-h1,h2,h3{font-family:"Mirador",Georgia,serif;font-weight:600;letter-spacing:-.01em;color:var(--nav);margin:0}
-h1{font-size:28px}h2{font-size:20px;margin:22px 0 8px}h3{font-size:15px;margin:12px 0 8px}
-.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-weight:700;font-size:11px;color:var(--txtgr)}
+body{background:var(--taupe);color:var(--nav);font-family:"GT America","Inter",Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;padding:22px 24px 60px;max-width:1400px;margin:0 auto}
+h1,h2,h3{font-family:"Mirador","Cormorant Garamond","Spectral",Georgia,serif;font-weight:600;letter-spacing:-.01em;color:var(--nav);margin:0}
+h1{font-size:clamp(26px,3vw,36px)}h2{font-size:clamp(18px,2vw,24px);margin:22px 0 8px}h3{font-size:15px;margin:12px 0 8px}
+.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-weight:800;font-size:11px;color:var(--txtgr)}
 .muted{color:var(--gray)}.small{font-size:11px;color:var(--gray)}
 .header-wrap{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:14px}
 .header-meta{text-align:right;font-size:12px;color:var(--gray)}
 .brand-stripe{height:4px;background:linear-gradient(90deg,var(--green) 0%,var(--blue) 40%,var(--yellow) 70%,var(--green) 100%);border-radius:2px;margin:6px 0 22px}
 .tile-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:6px 0 18px}
 .tile-row.ps{grid-template-columns:repeat(6,1fr)}
-.tile{background:#fff;border:1px solid var(--lgray);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow);min-height:90px}
-.tile .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);font-weight:700}
-.tile .val{font-size:22px;font-weight:600;font-family:"Mirador",Georgia,serif;margin-top:4px}
+.tile{background:#fff;border:1px solid var(--lgray);border-radius:3px;padding:12px 14px;box-shadow:var(--shadow);min-height:90px}
+.tile .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--gray);font-weight:800}
+.tile .val{font-size:22px;font-weight:600;font-family:"Mirador","Cormorant Garamond","Spectral",Georgia,serif;margin-top:4px}
 .tile .sub{font-size:11px;color:var(--nav);margin-top:3px}
 .tile .delta{font-size:12px;font-weight:600;margin-top:3px}
 .delta.up{color:var(--good)}.delta.down{color:var(--bad)}.delta.flat{color:var(--gray)}
-.card{background:#fff;border:1px solid var(--lgray);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px}
+.card{background:#fff;border:1px solid var(--lgray);border-radius:3px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px}
 .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:900px){.card-grid,.tile-row{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.card-grid,.tile-row{grid-template-columns:1fr}}
@@ -33,18 +36,18 @@ h1{font-size:28px}h2{font-size:20px;margin:22px 0 8px}h3{font-size:15px;margin:1
 table{width:100%;border-collapse:collapse;font-size:12px}
 table th,table td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--lgray)}
 table th:first-child,table td:first-child{text-align:left;font-weight:600}
-table th{text-transform:uppercase;letter-spacing:.06em;font-size:10px;color:var(--gray);font-weight:700}
+table th{text-transform:uppercase;letter-spacing:.12em;font-size:10px;background:#EFF0E5;color:#0D1B2A;font-weight:800;padding:8px 9px;border-bottom:1px solid #D8D9CC}
 table tr.total-row td{font-weight:700;background:var(--taupe);border-top:2px solid var(--nav)}
 td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600}td.flat{color:var(--gray)}
-.note{background:var(--taupe);border-left:3px solid var(--green);padding:9px 12px;border-radius:0 6px 6px 0;font-size:12px;margin:8px 0}
+.note{background:var(--taupe);border-left:3px solid var(--green);padding:9px 12px;border-radius:0 3px 3px 0;font-size:12px;margin:8px 0}
 .controls{display:flex;gap:10px;align-items:center;margin:8px 0 12px;flex-wrap:wrap}
 .controls label{font-size:11px;color:var(--gray);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-.controls select{font-family:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--lgray);border-radius:6px;background:#fff;color:var(--nav);cursor:pointer}
-.tabnav{display:flex;gap:4px;background:#fff;border:1px solid var(--lgray);border-radius:10px;padding:4px;margin:12px 0 18px}
-.tabbtn{flex:1;padding:10px 16px;border-radius:8px;border:none;cursor:pointer;background:transparent;color:var(--body);font-weight:500;font-size:13px;font-family:inherit;transition:all .15s;text-transform:uppercase;letter-spacing:.05em}
+.controls select{font-family:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--lgray);border-radius:3px;background:#fff;color:var(--nav);cursor:pointer}
+.tabnav{display:flex;gap:4px;background:#fff;border:1px solid var(--lgray);border-radius:3px;padding:4px;margin:12px 0 18px}
+.tabbtn{flex:1;padding:10px 16px;border-radius:2px;border:none;cursor:pointer;background:transparent;color:var(--body);font-weight:500;font-size:13px;font-family:inherit;transition:all .15s;text-transform:uppercase;letter-spacing:.05em}
 .tabbtn.active{background:var(--nav);color:var(--yellow);font-weight:700}
 .tabpanel{display:none}.tabpanel.active{display:block}
-.insight{background:#fff;border:1px solid var(--lgray);border-top:3px solid var(--txtgr);border-radius:12px;padding:16px 20px;box-shadow:var(--shadow);margin-bottom:12px}
+.insight{background:#fff;border:1px solid var(--lgray);border-top:3px solid var(--txtgr);border-radius:3px;padding:16px 20px;box-shadow:var(--shadow);margin-bottom:12px}
 .insight .hd{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
 .insight .icn{font-size:17px;line-height:1}
 .insight .ttl{font-weight:700;font-size:14px;color:var(--nav)}
@@ -57,15 +60,24 @@ td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600
 .insight.dkgr{border-top-color:var(--dkgrn)}
 .rec{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--lgray)}
 .rec:last-child{border-bottom:none}
-.rec .pr{font-size:10px;font-weight:700;color:var(--nav);border-radius:4px;padding:3px 10px;white-space:nowrap;letter-spacing:.02em;margin-top:2px}
+.rec .pr{font-size:10px;font-weight:700;color:var(--nav);border-radius:2px;padding:3px 10px;white-space:nowrap;letter-spacing:.02em;margin-top:2px}
 .rec.high .pr{background:var(--yellow)}
 .rec.med  .pr{background:var(--green)}
 .rec.low  .pr{background:var(--lgray)}
 .rec .bd{font-size:13px;color:var(--body);line-height:1.6}
-.err{background:#FDECEB;border:1px solid #C4391B;color:#8C2111;padding:10px 14px;border-radius:8px;font-size:12px;margin:8px 0;display:none}
+.err{background:#FDECEB;border:1px solid #C4391B;color:#8C2111;padding:10px 14px;border-radius:3px;font-size:12px;margin:8px 0;display:none}
 .err.on{display:block}
 .subhead{font-size:12px;color:var(--muted);margin:2px 0 14px}
 .footer-note{margin-top:30px;padding-top:16px;border-top:1px solid var(--lgray);color:var(--gray);font-size:11px}
+
+/* ===== Curebase-system additions ===== */
+.group-hdr{background:#0D1B2A;color:#F0F1E5;padding:8px 14px;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin:16px 0 0}
+.group-hdr .lim{color:#3BE0AD;font-weight:600}
+.callout{background:#CDDE3D;border-radius:3px;padding:16px 18px;margin-bottom:12px}
+.callout-title{font-size:10px;font-weight:800;letter-spacing:.14em;color:#0D1B2A;margin:0 0 8px;text-transform:uppercase}
+.callout-body{font-size:12.5px;line-height:1.55;color:#0D1B2A}
+.pill{display:inline-block;padding:3px 8px;font-size:9.5px;font-weight:800;letter-spacing:.10em;border-radius:2px;color:#fff;white-space:nowrap;text-transform:uppercase}
+.pill-strong{background:#19A078}.pill-adequate{background:#326CA3}.pill-gap{background:#D4962A}.pill-critical{background:#D0433A}
 </style>
 </head>
 <body>
@@ -141,7 +153,7 @@ td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
         <h3 style="margin:0">Weekly sessions vs Organic madlibs</h3>
-        <select id="org-wk-window" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:6px;background:#fff;color:var(--nav);cursor:pointer">
+        <select id="org-wk-window" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:3px;background:#fff;color:var(--nav);cursor:pointer">
           <option value="13">Last 13 wks</option>
           <option value="26" selected>Last 26 wks</option>
           <option value="52">All available</option>
@@ -152,7 +164,7 @@ td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
         <h3 style="margin:0" id="org-m-title">V→Madlib over time (monthly)</h3>
-        <select id="org-m-metric" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:6px;background:#fff;color:var(--nav);cursor:pointer">
+        <select id="org-m-metric" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:3px;background:#fff;color:var(--nav);cursor:pointer">
           <option value="v2m_pct" selected>V→Madlib %</option>
           <option value="sessions">Sessions</option>
           <option value="engaged_sessions">Engaged sessions</option>
@@ -186,7 +198,7 @@ td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
         <h3 style="margin:0">Weekly cost vs Ads madlibs</h3>
-        <select id="ps-wk-window" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:6px;background:#fff;color:var(--nav);cursor:pointer">
+        <select id="ps-wk-window" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:3px;background:#fff;color:var(--nav);cursor:pointer">
           <option value="8">Last 8 wks</option>
           <option value="18" selected>Last 18 wks</option>
           <option value="26">Last 26 wks</option>
@@ -198,7 +210,7 @@ td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
         <h3 style="margin:0" id="ps-m-title">CP / ML over time (monthly)</h3>
-        <select id="ps-m-metric" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:6px;background:#fff;color:var(--nav);cursor:pointer">
+        <select id="ps-m-metric" style="font-family:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--lgray);border-radius:3px;background:#fff;color:var(--nav);cursor:pointer">
           <option value="cp_ml" selected>CP / ML</option>
           <option value="cpc">CPC</option>
           <option value="cvr">CVR (click → ML)</option>
@@ -369,7 +381,7 @@ td.pos{color:var(--good);font-weight:600}td.neg{color:var(--bad);font-weight:600
   const pctCls=x=>x==null||Math.abs(x)<0.005?'flat':x>0?'up':'down';
   const rateColor=(v,t)=>v>=t[0]?'#3BE0AD':v>=t[1]?'#19A078':v>=t[2]?'#BFA836':'#C4391B';
   if(typeof Chart==='undefined'){err('Chart.js failed to load — check network');return;}
-  Chart.defaults.font.family='"GT America",Arial,Helvetica,sans-serif';
+  Chart.defaults.font.family='"GT America","Inter",Arial,Helvetica,sans-serif';
   Chart.defaults.color='#0F1C2C';Chart.defaults.borderColor='#EBEAE8';
 
   // Dashed segment for the partial-month trailing point on line charts.
